@@ -1,43 +1,94 @@
 # Fronteira Eficiente de Markowitz
 
-Este projeto realiza a construção da **fronteira eficiente de Markowitz** para análise de risco-retorno de carteiras de investimento baseadas em ações da bolsa brasileira (B3). Os dados são processados e analisados com auxílio de bibliotecas como `pandas`, `numpy`, `matplotlib` e `scipy`.
+Projeto em Python para analisar carteiras de acoes pela teoria moderna de portfolios. A ferramenta le planilhas historicas, calcula retornos e risco anualizados, simula milhares de carteiras, otimiza os pontos de minima variancia e maximo Sharpe e exporta um relatorio Excel com graficos e metricas.
 
-## 📊 Objetivo
+## O que o projeto entrega
 
-- Calcular os retornos diários de um conjunto de ações.
-- Estimar os riscos (desvio-padrão) e retornos esperados.
-- Gerar 1000 carteiras aleatórias para traçar a fronteira eficiente.
-- Determinar as carteiras de:
-  - **Mínima variância (risco mínimo)**
-  - **Máximo índice de Sharpe**
-- Exportar resultados para um arquivo Excel com gráficos e métricas.
+- Descoberta automatica de ativos por padrao de arquivo (`*_year1.xlsx` por padrao).
+- Suporte a configuracao manual de ativos via CLI.
+- Calculo de retornos diarios, excesso de retorno, matriz de covariancia e matriz de correlacao.
+- Carteiras de referencia:
+  - igualmente ponderada;
+  - minima variancia;
+  - maximo indice de Sharpe.
+- Simulacao reprodutivel de carteiras aleatorias com seed configuravel.
+- Fronteira eficiente otimizada por alvo de retorno.
+- Relatorio Excel formatado com abas de resumo, parametros, ativos, series historicas, matrizes e simulacoes.
+- Grafico PNG da fronteira eficiente.
+- Testes unitarios para as funcoes centrais.
 
-## 📂 Ações utilizadas
+## Estrutura
 
-- ELET3 (Eletrobras)
-- VALE3 (Vale)
-- PETR4 (Petrobras)
-- MGLU3 (Magazine Luiza)
-- BBDC4 (Bradesco)
+```text
+.
+├── main.py                  # CLI e motor de analise
+├── requirements.txt         # dependencias Python
+├── tests/                   # testes unitarios
+├── *_year1.xlsx             # dados historicos de exemplo
+├── *_year2.xlsx             # dados historicos adicionais
+└── reports/                 # saidas geradas localmente (ignorado pelo git)
+```
 
-> ⚠️ Certifique-se de que os arquivos `.xlsx` contendo os dados estejam no mesmo diretório do script:
-> - `ELET3_year1.xlsx`
-> - `VALE3_year1.xlsx`
-> - `PETR4_year1.xlsx`
-> - `MGLU3_year1.xlsx`
-> - `BBDC4_year1.xlsx`
+## Requisitos
 
-## ⚙️ Requisitos
+- Python 3.10+
+- pip
 
-- Python 3.8+
-- Bibliotecas:
-  - pandas
-  - numpy
-  - scipy
-  - matplotlib
-  - openpyxl
-
-Instale as dependências com:
+Instale as dependencias:
 
 ```bash
-pip install pandas numpy scipy matplotlib openpyxl
+python -m pip install -r requirements.txt
+```
+
+## Como executar
+
+Uso padrao, lendo os arquivos `*_year1.xlsx` no diretorio atual:
+
+```bash
+python main.py
+```
+
+Saidas geradas:
+
+- `reports/markowitz_analysis.xlsx`
+- `reports/efficient_frontier.png`
+
+Rodando com os dados do segundo ano:
+
+```bash
+python main.py --pattern "*_year2.xlsx" --output reports/year2_analysis.xlsx --chart reports/year2_frontier.png
+```
+
+Configurando ativos manualmente:
+
+```bash
+python main.py \
+  --asset ELET3=ELET3_year1.xlsx \
+  --asset VALE3=VALE3_year1.xlsx \
+  --asset PETR4=PETR4_year1.xlsx
+```
+
+Alterando parametros da simulacao:
+
+```bash
+python main.py --portfolios 10000 --frontier-points 100 --risk-free-rate 0.105 --seed 123
+```
+
+## Formato esperado das planilhas
+
+Cada arquivo deve conter pelo menos as colunas:
+
+- `Date`: data do pregao;
+- `Close`: preco de fechamento.
+
+As demais colunas podem existir e serao ignoradas pela analise.
+
+## Testes
+
+```bash
+python -m unittest discover -s tests
+```
+
+## Observacao importante
+
+Este projeto e educacional e nao constitui recomendacao de investimento. Os resultados dependem da janela historica, da qualidade dos dados e das premissas adotadas.
